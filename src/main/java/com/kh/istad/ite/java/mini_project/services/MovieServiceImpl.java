@@ -20,6 +20,38 @@ public class MovieServiceImpl implements MovieService {
     private static final String BASE_URL = "https://api.themoviedb.org/3";
 
 
+    // COMMON PARSER (REUSE)
+    private List<Movies> parseMovieList(String res) {
+
+        List<Movies> list = new ArrayList<>();
+
+        if (res == null || !res.trim().startsWith("{")) {
+            return list;
+        }
+
+        JSONObject json = new JSONObject(res);
+        JSONArray results = json.getJSONArray("results");
+
+        for (int i = 0; i < results.length(); i++) {
+
+            JSONObject obj = results.getJSONObject(i);
+
+            Movies m = new Movies();
+            m.setId(obj.getInt("id"));
+            m.setTitle(obj.getString("title"));
+            m.setReleaseDate(obj.optString("release_date", "N/A"));
+            m.setRating(obj.getDouble("vote_average"));
+
+            // Skip trailer here (performance)
+            m.setTrailerUrl("N/A");
+
+            list.add(m);
+        }
+
+        return list;
+    }
+
+
     @Override
     public List<Movies> search(String query, int page) {
 
@@ -114,5 +146,61 @@ public class MovieServiceImpl implements MovieService {
         d.setOrigin(origin.toString());
 
         return d;
+    }
+
+    @Override
+    public List<Movies> getTrending() {
+        String url = BASE_URL + "/trending/movie/day";
+        String res = ApiClient.get(url);
+        return parseMovieList(res);
+    }
+
+    @Override
+    public List<Movies> getPopular(int page) {
+        String url = BASE_URL + "/movie/popular?page=" + page;
+        String res = ApiClient.get(url);
+        return parseMovieList(res);
+    }
+
+    @Override
+    public List<Movies> getTopRated(int page) {
+        String url = BASE_URL + "/movie/top_rated?page=" + page;
+        String res = ApiClient.get(url);
+        return parseMovieList(res);
+    }
+
+    @Override
+    public List<Movies> getNowPlaying(int page) {
+        String url = BASE_URL + "/movie/now_playing?page=" + page;
+        String res = ApiClient.get(url);
+        return parseMovieList(res);
+    }
+
+    @Override
+    public List<Movies> getSimilar(int movieId) {
+        String url = BASE_URL + "/movie/" + movieId + "/similar";
+        String res = ApiClient.get(url);
+        return parseMovieList(res);
+    }
+
+    @Override
+    public List<String> getCast(int movieId) {
+        List<String> castList = new ArrayList<>();
+
+        String url = BASE_URL + "/movie/" + movieId + "/credits";
+        String res = ApiClient.get(url);
+
+        if (res == null || !res.trim().startsWith("{")) {
+            return castList;
+        }
+
+        JSONObject json = new JSONObject(res);
+        JSONArray cast = json.getJSONArray("cast");
+
+        for (int i = 0; i < cast.length() && i < 10; i++) {
+            JSONObject c = cast.getJSONObject(i);
+            castList.add(c.getString("name"));
+        }
+        return castList;
     }
 }

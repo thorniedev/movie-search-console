@@ -1,0 +1,43 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.kh.istad.ite.java.mini_project'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:6.0.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    //
+    implementation 'org.json:json:20240303'
+
+    // for Lombok
+    compileOnly 'org.projectlombok:lombok:latest.release'
+    annotationProcessor 'org.projectlombok:lombok:latest.release'
+
+    // for table print data
+    implementation 'de.vandermeer:asciitable:0.3.2'
+
+    //
+    implementation 'com.googlecode.json-simple:json-simple:1.1.1'
+
+    // for log information
+    implementation 'org.slf4j:slf4j-api:2.0.12'
+
+    implementation 'org.nocrala.tools.texttablefmt:text-table-formatter:1.2.4'
+
+    implementation 'org.mapstruct:mapstruct:1.6.3'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
+
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.20.0'
+}
+
+test {
+    useJUnitPlatform()
+}
